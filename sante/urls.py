@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from login import views
 from rest_framework import routers
  
@@ -14,4 +14,5 @@ urlpatterns = [
     # url('', include(router.urls)),
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
     path('login/',views.user_login),
+    path('api/', include('allaboutfeet.urls')),
 ]

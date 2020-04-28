@@ -37,11 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'login',
+    'corsheaders',
     'rest_framework',
+    'login',
+    'allaboutfeet',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,6 +55,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'sante.urls'
+
+# CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = [
+         'http://localhost:3000'
+]
+
 
 TEMPLATES = [
     {
@@ -79,7 +89,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sante_db',
-        'USER' : 'gk123',
+        'USER' : 'postgres',
         'PASSWORD' : '123',
         'HOST' : 'localhost',
         'PORT' : '5432',
@@ -124,3 +134,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+SECURE_SSL_REDIRECT = False

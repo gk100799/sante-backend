@@ -7,18 +7,23 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
 
-@api_view(['POST'])
+# @method_decorator(csrf_protect)
+@api_view(['POST','GET'])
 def user_login(request):
+    # import ipdb; ipdb.set_trace()
     #if request.method == "POST":
-    serializer_class = LoginSerializer
-    username = request.data['username']
-    password = request.data['password']
+    # serializer_class = LoginSerializer
+    username = (request.data['username']).strip()
+    password = (request.data['password']).strip()
+    print(username, password)
     try:
         user = User.objects.get(username = username, password = password)
     except:
         return Response({"message":"Invalid Username or Password"},status=status.HTTP_401_UNAUTHORIZED)
-    return Response({"message":"successfully logged in!"}, status=status.HTTP_202_ACCEPTED)
+    return Response({"loggedIn" : "true"}, status=status.HTTP_202_ACCEPTED)
 
 
 # from django.shortcuts import render, redirect
@@ -90,3 +95,4 @@ def user_login(request):
 
 
 
+   
