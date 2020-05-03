@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+
 
 # Create your models here.
 class Products(models.Model):
@@ -44,17 +46,40 @@ class Colors(models.Model):
 
 
 class Sizes(models.Model):
-    size = models.IntegerField(primary_key=True)
+    size = models.CharField(primary_key=True, max_length=5)
 
     class Meta:
         managed = False
         db_table = 'allaboutfeet_sizes'
 
-class Productbrand(models.Model):
-    pid = models.ForeignKey('Products', models.DO_NOTHING, db_column='pid', blank=True, null=True)
+class ProductSubs(models.Model):
+    pid = models.ForeignKey('Products', models.DO_NOTHING, db_column='pid',primary_key=True, blank=True, null=False)
     bname = models.ForeignKey('Brand', models.DO_NOTHING, db_column='bname', blank=True, null=True)
+    cname = models.ForeignKey('Category', models.DO_NOTHING, db_column='cname', blank=True, null=True)
+    sname = models.ForeignKey('Style', models.DO_NOTHING, db_column='sname', blank=True, null=True)
+    color = models.ForeignKey('Colors', models.DO_NOTHING, db_column='color', blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'allaboutfeet_productbrand'
+        db_table = 'allaboutfeet_productsubs'
 
+class ProductSizes(models.Model):
+    pid = models.ForeignKey('Products', models.DO_NOTHING, db_column='pid')
+    size = models.ForeignKey('Sizes', models.DO_NOTHING, db_column='size')
+    
+    class Meta:
+        managed = False
+        db_table = 'allaboutfeet_productsizes'
+        unique_together = (('pid', 'size'),)
+
+
+class Cart(models.Model):
+    user_id = models.IntegerField()
+    id = models.AutoField(primary_key=True)
+    pid = models.IntegerField()
+    quantity = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'allaboutfeet_cart'
+        unique_together = (('user_id', 'pid'),)

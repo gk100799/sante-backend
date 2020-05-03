@@ -1,98 +1,46 @@
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
-from login.models import User
-from login.serializers import LoginSerializer
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.request import Request
+
+from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_protect
-from django.utils.decorators import method_decorator
-
-# @method_decorator(csrf_protect)
-@api_view(['POST','GET'])
-def user_login(request):
-    # import ipdb; ipdb.set_trace()
-    #if request.method == "POST":
-    # serializer_class = LoginSerializer
-    username = (request.data['username']).strip()
-    password = (request.data['password']).strip()
-    print(username, password)
-    try:
-        user = User.objects.get(username = username, password = password)
-    except:
-        return Response({"message":"Invalid Username or Password"},status=status.HTTP_401_UNAUTHORIZED)
-    return Response({"loggedIn" : "true"}, status=status.HTTP_202_ACCEPTED)
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializers import UserSerializer, UserSerializerWithToken
+from allaboutfeet.models import Products, Cart
 
 
-# from django.shortcuts import render, redirect
-# from django.http import JsonResponse
-# from django.contrib.auth import authenticate as userAuthenticate, login as auth_login, logout as auth_logout
-# from django.utils.datastructures import MultiValueDictKeyError
-# from django.contrib.auth.forms import AuthenticationForm
-# from django.contrib.auth.models import update_last_login
-# from .models import ScoreUser
-# import logging
-# from django.conf import settings
-# import re
-# import json
-# from django.views.decorators.csrf import csrf_exempt
-
-# logger = logging.getLogger('AM')
-
-
-# @csrf_exempt
-# def authenticate(request):
-#     """
-#     ---------------------------------------------------------------------------
-#     Authenticate the user based on the username and
-#     password.
-#     ---------------------------------------------------------------------------
-#     :param request: HTTP Request Parameter with POST Data
-#     :return: HTTP Render Response
-#     """
-#     """
-#     TODO: Handle the Loggin and Tracing
-#     """
-#     # Get the Username and Password from the HTTP Request
-#     #
-#     try:
-#         jsonData = json.loads(request.body.decode('utf-8'))
-#         username = jsonData['Username']
-#         password = jsonData['Password']
-
-#         logger.info("Login Requested")
-
-#     except MultiValueDictKeyError:
-#         logger.error('Username or Password missing in the HTTP Request')
-#         # if the Error Message defined share the message
-#         return JsonResponse(status=500, safe=False)
-
-#     # Authenticate the  user based on the username and password
-#     #
-#     user = userAuthenticate(username=username, password=password)
-    
-#     if user:
-#         logger.info('%s User Authenticated', username)
-#         auth_login(request, user)
-#         responseData = {
-#             'isAuthenticated': 'true',
-#             'firstLogin': True,
-#             'url': '/dashboard/home'
-#         }
-#         request.session['userId'] = user.email
-#         return JsonResponse(responseData, status=200)        
-#     else:
-        
-# logger.error('Incorrect login info for User %s', username)
-#         responseData = {
-#             'isAuthenticated': 'false',
-#             'uuid': '',
-#             'invalidCredentials':'True',
-#         }
-#         return JsonResponse(responseData, status=401)
+@api_view(['GET'])
+def current_user(request):
+    """
+    Determine the current user by their token, and return their data
+    """
+    user = request.user
+    # print(request.user.id)
+    # serializer = UserSerializer(user)
+    # print(user)
+    # cursor = connection.cursor()
+    # userId = User.objects.get(username=user).id
+    # cartItems = Cart.objects.raw("SELECT count(*) as count FROM allaboutfeet_cart WHERE user_id=%s", [request.user])
+    cartItems = Cart.objects.filter(user_id=user.id).count()
+    print(cartItems)
+    data = {
+        "username": str(user),
+        "cart": cartItems,
+    }
+    return Response(data)
 
 
+class UserList(APIView):
+    """
+    Create a new user. It's called 'UserList' because normally we'd have a get
+    method here too, for retrieving a list of all User objects.
+    """
 
-   
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = UserSerializerWithToken(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
