@@ -83,3 +83,21 @@ class Cart(models.Model):
         managed = False
         db_table = 'allaboutfeet_cart'
         unique_together = (('user_id', 'pid'),)
+
+
+class ProductDetails(models.Model):
+    pid = models.IntegerField(primary_key=True)
+    pname = models.CharField(max_length=25)
+    price = models.IntegerField()
+    dprice = models.IntegerField(blank=True, null=True)
+    desciption = models.CharField(max_length=100, blank=True, null=True)
+    imagename = models.CharField(max_length=20, blank=False)
+    bname = models.CharField(max_length=20)
+    cname = models.CharField(max_length=20)
+    sname = models.CharField(max_length=20)
+    color = models.CharField(max_length=20)
+
+
+    class Meta:
+        managed = False
+        db_table = 'productdetails'

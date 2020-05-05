@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from allaboutfeet.models import Products, Cart
+from allaboutfeet.models import Products, Cart, ProductDetails
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -28,7 +28,6 @@ def get_products(request):
     #         'image': prod.imagename,
     #     })
     # print(products)
-    # context2 = serializers.serialize('json', context)
     context3 = json.loads(serializers.serialize('json', context))
     context1 = []
     for obj in context3:
@@ -84,3 +83,40 @@ def cartItems(request):
             # })
         return Response(data=items,status=status.HTTP_200_OK)
     return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([])
+def filterProducts(request):
+    filters = request.data
+    products=[]
+    if ('brands' in filters):
+        for brand in filters['brands']:
+            brandProducts = ProductDetails.objects.filter(bname=brand)
+            context2 = json.loads(serializers.serialize('json', brandProducts))
+            for obj in context2:
+                x=obj['fields']
+                x['pid']=obj['pk']
+                products.append(x)
+    if ('styles' in filters):
+        for style in filters['styles']:
+            styleProducts = ProductDetails.objects.filter(sname=style)
+            context2 = json.loads(serializers.serialize('json', styleProducts))
+            for obj in context2:
+                x=obj['fields']
+                x['pid']=obj['pk']
+                products.append(x)
+    if ('colors' in filters):
+        for color in filters['colors']:
+            colorProducts = ProductDetails.objects.filter(color=color)
+            context2 = json.loads(serializers.serialize('json', colorProducts))
+            # context1 = []
+            for obj in context2:
+                x=obj['fields']
+                x['pid']=obj['pk']
+                products.append(x)
+    print(products)
+
+    return Response()
+
+
+

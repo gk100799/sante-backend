@@ -12,6 +12,8 @@ from rest_framework import routers
 urlpatterns = [
     path('product/<int:prodId>/',views.productDetails),
     path('products/', views.get_products),
+    path('products/men', views.get_products),
     path('add-to-cart/<str:prodIdQuantity>/', views.addToCart),
     path('cart-items/', views.cartItems),
+    path('products/filter/', views.filterProducts),
 ]
