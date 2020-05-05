@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from allaboutfeet.models import Products, Cart, ProductDetails
+from allaboutfeet.models import Products, Cart, ProductDetails, Brand, Style, Colors, Sizes
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -10,6 +10,9 @@ from django.forms.models import model_to_dict
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from django.contrib.auth.models import User
+from django.db.models import Q
+
+
 
 # @authentication_classes(())
 # @permission_classes(())
@@ -19,15 +22,6 @@ from django.contrib.auth.models import User
 def get_products(request):
     # import ipdb; ipdb.set_trace()
     context = Products.objects.all()
-    # products = []
-    # for prod in context:
-    #     products.append({
-    #         'pid': prod.pid,
-    #         'pname': prod.pname,
-    #         'price': prod.price,
-    #         'image': prod.imagename,
-    #     })
-    # print(products)
     context3 = json.loads(serializers.serialize('json', context))
     context1 = []
     for obj in context3:
@@ -52,9 +46,8 @@ def addToCart(request,prodIdQuantity):
     # import ipdb; ipdb.set_trace()
     user = request.user
     prodId, quant = map(int,prodIdQuantity.split('_'))
-    inCart = Cart.objects.get(user_id=user.id, pid=prodId)
-    print(model_to_dict(inCart))
-    if inCart:
+    if Cart.objects.filter(user_id=user.id, pid=prodId).exists():
+        inCart = Cart.objects.get(user_id=user.id, pid=prodId)
         inCart.quantity = inCart.quantity + 1
         inCart.save()
         return Response(data={'created':'false'},status=status.HTTP_201_CREATED)
@@ -88,35 +81,23 @@ def cartItems(request):
 @permission_classes([])
 def filterProducts(request):
     filters = request.data
+    objects = list(filters)
     products=[]
-    if ('brands' in filters):
-        for brand in filters['brands']:
-            brandProducts = ProductDetails.objects.filter(bname=brand)
-            context2 = json.loads(serializers.serialize('json', brandProducts))
-            for obj in context2:
-                x=obj['fields']
-                x['pid']=obj['pk']
-                products.append(x)
-    if ('styles' in filters):
-        for style in filters['styles']:
-            styleProducts = ProductDetails.objects.filter(sname=style)
-            context2 = json.loads(serializers.serialize('json', styleProducts))
-            for obj in context2:
-                x=obj['fields']
-                x['pid']=obj['pk']
-                products.append(x)
-    if ('colors' in filters):
-        for color in filters['colors']:
-            colorProducts = ProductDetails.objects.filter(color=color)
-            context2 = json.loads(serializers.serialize('json', colorProducts))
-            # context1 = []
-            for obj in context2:
-                x=obj['fields']
-                x['pid']=obj['pk']
-                products.append(x)
+    brands = list(Brand.objects.values_list('bname', flat=True))
+    style = list(Style.objects.values_list('sname', flat=True))
+    color = list(Colors.objects.values_list('color', flat=True))
+    if len(filters['brands']) == 0 : filters['brands'] = brands
+    if len(filters['styles']) == 0 : filters['styles'] = style
+    if len(filters['colors']) == 0 : filters['colors'] = color
+    prods = ProductDetails.objects.filter(
+        Q(bname__in=filters['brands']),
+        Q(sname__in=filters['styles']),
+        Q(color__in=filters['colors'])
+    )
+    context2 = json.loads(serializers.serialize('json', prods))
+    for obj in context2:
+        x=obj['fields']
+        x['pid']=obj['pk']
+        products.append(x)
     print(products)
-
-    return Response()
-
-
-
+    return Response(data=products, status=status.HTTP_200_OK)

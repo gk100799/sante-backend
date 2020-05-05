@@ -14,13 +14,8 @@ def current_user(request):
     """
     Determine the current user by their token, and return their data
     """
+    # import ipdb; ipdb.set_trace()
     user = request.user
-    # print(request.user.id)
-    # serializer = UserSerializer(user)
-    # print(user)
-    # cursor = connection.cursor()
-    # userId = User.objects.get(username=user).id
-    # cartItems = Cart.objects.raw("SELECT count(*) as count FROM allaboutfeet_cart WHERE user_id=%s", [request.user])
     cartItems = Cart.objects.filter(user_id=user.id).count()
     print(cartItems)
     data = {
