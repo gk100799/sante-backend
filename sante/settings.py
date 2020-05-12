@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 from datetime import timedelta
-import django_heroku
-django_heroku.settings(locals())
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -126,10 +124,10 @@ WSGI_APPLICATION = 'sante.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sante_db',
-        'USER' : 'postgres',
-        'PASSWORD' : '123',
-        'HOST' : 'localhost',
+        'NAME': 'd1bntgiqft7olo',
+        'USER' : 'mwiqoupqprgvxt',
+        'PASSWORD' : '18d02cb8b55151675b41960538f36e7fff06ef4200f57b9af7b6ea67c9182f9c',
+        'HOST' : 'ec2-34-233-186-251.compute-1.amazonaws.com',
         'PORT' : '5432',
     }
 }
