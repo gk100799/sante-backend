@@ -74,7 +74,7 @@ ROOT_URLCONF = 'sante.urls'
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
-    # 'http://gk100799.github.io'
+    'http://gk100799.github.io'
 ]
 
 
