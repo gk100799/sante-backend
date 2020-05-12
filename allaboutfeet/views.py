@@ -81,6 +81,7 @@ def cartItems(request):
 
 @api_view(['POST'])
 @permission_classes([])
+@authentication_classes([])
 def filterProducts(request):
     filters = request.data
     objects = list(filters)
