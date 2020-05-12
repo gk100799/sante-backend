@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from allaboutfeet.models import Products, Cart, ProductDetails, Brand, Style, Colors, Sizes
+from allaboutfeet.models import Products, Cart, ProductDetails, Brand, Style, Colors, Sizes, Orders
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -42,16 +42,16 @@ def productDetails(request, prodId):
 
 
 @api_view(['POST'])
-def addToCart(request,prodIdQuantity):
+def addToCart(request,prodIdQuantitySize):
     # import ipdb; ipdb.set_trace()
     user = request.user
-    prodId, quant = map(int,prodIdQuantity.split('_'))
-    if Cart.objects.filter(user_id=user.id, pid=prodId).exists():
-        inCart = Cart.objects.get(user_id=user.id, pid=prodId)
+    prodId, quant, size = map(int,prodIdQuantitySize.split('_'))
+    if Cart.objects.filter(user_id=user.id, pid=prodId, size=size).exists():
+        inCart = Cart.objects.get(user_id=user.id, pid=prodId, size=size)
         inCart.quantity = inCart.quantity + 1
         inCart.save()
         return Response(data={'created':'false'},status=status.HTTP_201_CREATED)
-    cart = Cart.objects.create(user_id=user.id, pid=prodId, quantity=quant)
+    cart = Cart.objects.create(user_id=user.id, pid=prodId, quantity=quant, size=size)
     cart.save()
     return Response(data={'created':'true'}, status=status.HTTP_201_CREATED)
 
@@ -69,6 +69,8 @@ def cartItems(request):
             product = Products.objects.get(pid=item.pid)
             context = model_to_dict(product)
             context['quantity'] = item.quantity
+            context['size'] = item.size
+            context['id'] = item.id
             items.append(context)
             # context3 = json.loads(serializers.serialize('json', context))
             # items.append({
@@ -101,3 +103,49 @@ def filterProducts(request):
         products.append(x)
     print(products)
     return Response(data=products, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def updateCart(request):
+    user = request.user
+    prodId = request.data['pid']
+    quantity = request.data['quantity']
+    size = request.data['size']
+    inCart = Cart.objects.get(user_id=user.id, pid=prodId, size=size)
+    inCart.quantity = quantity
+    inCart.save()
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def updateSizeCart(request):
+    user = request.user
+    prodId = request.data['pid']
+    oldSize = request.data['oldSize']
+    size = request.data['size']
+    if Cart.objects.filter(user_id=user.id, pid=prodId, size=size).exists():
+        inCart = Cart.objects.get(user_id=user.id, pid=prodId, size=size)
+        inCart.quantity += 1
+        Cart.objects.filter(user_id=user.id, pid=prodId, size=oldSize).delete()
+        return Response(data={'updatedQuantity':'true'},status=status.HTTP_201_CREATED)
+    inCart = Cart.objects.get(user_id=user.id, pid=prodId, size=oldSize)
+    inCart.size = size
+    inCart.save()
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+def deleteCartItem(request, prodIdSize):
+    user = request.user
+    prodId, size = prodIdSize.split('_')
+    Cart.objects.filter(user_id=user.id, pid=prodId, size=size).delete()
+    return Response(status=status.HTTP_202_ACCEPTED)
+
+
+@api_view(['POST'])
+def orders(request):
+    user = request.user
+    data = request.data
+    cart = list(Cart.objects.filter(user_id=user.id))
+    order = Orders.objects.create(cart)
+    order.save()
+    return Response(status=status.HTTP_201_CREATED)

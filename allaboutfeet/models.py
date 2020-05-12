@@ -78,6 +78,7 @@ class Cart(models.Model):
     id = models.AutoField(primary_key=True)
     pid = models.IntegerField()
     quantity = models.IntegerField(blank=True, null=True)
+    size = models.IntegerField(blank=False, null=False)
 
     class Meta:
         managed = False
@@ -101,3 +102,16 @@ class ProductDetails(models.Model):
     class Meta:
         managed = False
         db_table = 'productdetails'
+
+
+class Orders(models.Model):
+    user_id = models.IntegerField()
+    id = models.AutoField(primary_key=True)
+    pid = models.IntegerField()
+    quantity = models.IntegerField(blank=True, null=True)
+    size = models.IntegerField(blank=False, null=False)
+
+    class Meta:
+        managed = False
+        db_table = 'allaboutfeet_orders'
+        unique_together = (('user_id', 'pid'),)
