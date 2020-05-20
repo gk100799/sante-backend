@@ -5,11 +5,11 @@ from django.conf import settings
 # Create your models here.
 class Products(models.Model):
     pid = models.IntegerField(primary_key=True)
-    pname = models.CharField(max_length=25)
+    pname = models.CharField(max_length=50)
     price = models.IntegerField()
     dprice = models.IntegerField(blank=True, null=True)
-    desciption = models.CharField(max_length=100, blank=True, null=True)
-    imagename = models.CharField(max_length=20, blank=False)
+    desciption = models.CharField(max_length=500, blank=True, null=True)
+    imagename = models.CharField(max_length=90, blank=False)
 
     class Meta:
         managed = False
