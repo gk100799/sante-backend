@@ -11,7 +11,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 # admin.autodiscover()
 
 urlpatterns = [
-    path('/', admin.site.urls),
+    path('', admin.site.urls),
     # url('', include(router.urls)),
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
     # path('login/',views.user_login),
