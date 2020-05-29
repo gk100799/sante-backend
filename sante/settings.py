@@ -26,7 +26,7 @@ SECRET_KEY = '())1==jvq3bddl_7%@c_@l-+f_m0v@d0b9e4_yxdbd#(zc@sgl'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['allaboutfeet.herokuapp.com','allaboutfeet-live.herokuapp.com', '127.0.0.1','gk100799.github.io']
+ALLOWED_HOSTS = ['allaboutfeet.herokuapp.com','allaboutfeet-live.herokuapp.com', '127.0.0.1','gk100799.github.io','allaboutfeet.site']
 
 
 # Application definition

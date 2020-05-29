@@ -146,7 +146,7 @@ def deleteCartItem(request, prodIdSize):
 def orders(request):
     user = request.user
     data = request.data
-    cart = list(Cart.objects.filter(user_id=user.id).delete())
+    cart = Cart.objects.filter(user_id=user.id).delete()
     order = Orders.objects.create(cart)
     order.save()
     return Response(status=status.HTTP_201_CREATED)
