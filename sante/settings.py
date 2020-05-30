@@ -75,7 +75,8 @@ ROOT_URLCONF = 'sante.urls'
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'https://gk100799.github.io',
-    'https://allaboutfeet.site/'
+    'https://allaboutfeet.site/',
+    'https://www.allaboutfeet.site/'
 ]
 
 
